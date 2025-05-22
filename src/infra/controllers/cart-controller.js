@@ -72,13 +72,28 @@ export class CartController {
     this.paintAtScreenSummary(summary);
   }
 
-  removeItemFromCart(productId) {
-    this.removeItemFromCartUseCase.execute(productId);
-    const productElement = document.getElementById(`product-${productId}`);
-    if (productElement) {
+  async removeItemFromCart(productId) {
+  await this.removeItemFromCartUseCase.execute(productId);
+
+  const productElement = document.getElementById(`product-${productId}`);
+  if (productElement) {
+    const quantitySpan = productElement.querySelector("span");
+    const currentQuantity = parseInt(
+      quantitySpan.textContent.replace(/\D/g, ""),
+      10
+    );
+
+    const newQuantity = currentQuantity - 1;
+
+    if (newQuantity <= 0) {
       this.cartContainer.removeChild(productElement);
+    } else {
+      quantitySpan.textContent = `Quantity: ${newQuantity}`;
     }
   }
+
+  await this.viewCart();
+}
 
   clearCart() {
     this.clearCartUseCase.execute();
